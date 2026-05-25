@@ -109,7 +109,7 @@
         let headingAngle = 0;
         const turningSpeed = 0.045;
         
-        // Fluid Drag Tracking Array Matrices (Feeds smooth tracking values to the tail segments)
+        // Fluid Drag Tracking Array Matrices
         let trackingX = [], trackingY = [], trackingZ = [], trackingRotY = [];
         const segmentDelayInterval = 6; 
 
@@ -122,7 +122,7 @@
             // 1. Setup Scene Framework & Beautiful Saffron Fog
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x0f051d); 
-            scene.fog = new THREE.FogExp2(0xff4500, 0.004); // Vibrant orange mountain sunrise mist
+            scene.fog = new THREE.FogExp2(0xff4500, 0.004); 
 
             // 2. High-FOV Tracking Camera Lens
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 1200);
@@ -133,19 +133,19 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.shadowMap.enabled = true;
 
-            // 4. Vibrant Structural Lighting Layout (Imperial Saffron & Red Accents)
-            const globalAmbient = new THREE.AmbientLight(0x3a105c, 0.75); // Deep spiritual purple floor reflection
+            // 4. Vibrant Structural Lighting Layout
+            const globalAmbient = new THREE.AmbientLight(0x3a105c, 0.75); 
             scene.add(globalAmbient);
 
-            const majesticSun = new THREE.DirectionalLight(0xffcc00, 1.4); // Golden celestial primary illumination
+            const majesticSun = new THREE.DirectionalLight(0xffcc00, 1.4); 
             majesticSun.position.set(80, 150, 40);
             scene.add(majesticSun);
 
-            const horizonFillLight = new THREE.PointLight(0xff3b00, 1.2, 300); // Fiery core ground glow
+            const horizonFillLight = new THREE.PointLight(0xff3b00, 1.2, 300); 
             horizonFillLight.position.set(0, -10, 0);
             scene.add(horizonFillLight);
 
-            // 5. Instantiating Procedural Vector Textures (Bypasses missing image link bugs completely)
+            // 5. Instantiating Procedural Vector Textures
             const prayerFlagTexture = createFlagTexture();
             const cloudSeaTexture = createCloudSeaTexture();
 
@@ -167,21 +167,17 @@
             animate();
         }
 
-        // =========================================================================
-        // PROCEDURAL MATERIAL GENERATION CANVAS INJECTIONS
-        // =========================================================================
         function createFlagTexture() {
             const canvas = document.createElement('canvas');
             canvas.width = 256; canvas.height = 64;
             const ctx = canvas.getContext('2d');
-            const traditionalColors = ['#0044ff', '#ffffff', '#dc0000', '#00aa44', '#ffcc00']; // Blue, White, Red, Green, Yellow
+            const traditionalColors = ['#0044ff', '#ffffff', '#dc0000', '#00aa44', '#ffcc00']; 
             const stripeWidth = 256 / traditionalColors.length;
             
             for(let i = 0; i < traditionalColors.length; i++) {
                 ctx.fillStyle = traditionalColors[i];
                 ctx.fillRect(i * stripeWidth, 0, stripeWidth, 64);
                 
-                // Overlay sacred mantra script glyph mock-lines
                 ctx.fillStyle = 'rgba(10, 5, 25, 0.2)';
                 ctx.font = 'bold 9px Courier New';
                 ctx.fillText('༄ཨོཾམཎི', i * stripeWidth + 4, 26);
@@ -197,7 +193,6 @@
             
             ctx.fillStyle = '#0f051d'; ctx.fillRect(0, 0, 512, 512);
             
-            // Draw interlocking spiraling cloud linework motifs
             ctx.strokeStyle = 'rgba(255, 69, 0, 0.4)'; ctx.lineWidth = 4;
             for(let i = 0; i < 30; i++) {
                 ctx.beginPath();
@@ -210,13 +205,9 @@
             return texture;
         }
 
-        // =========================================================================
-        // REALM GEOMETRIES & BARRIER ENGINES
-        // =========================================================================
         function generateRealmEnvironment(cloudTex, flagTex) {
             cloudTex.repeat.set(30, 30);
             
-            // Swirling Baseline Cloud Floor Matrix
             const baseFloorGeo = new THREE.PlaneGeometry(realmSize, realmSize);
             const baseFloorMat = new THREE.MeshStandardMaterial({ map: cloudTex, roughness: 0.95, metalness: 0.1 });
             const cloudFloor = new THREE.Mesh(baseFloorGeo, baseFloorMat);
@@ -224,8 +215,7 @@
             cloudFloor.position.y = -5;
             scene.add(cloudFloor);
 
-            // Spawning High Altitude Craggy Mountain Steppes
-            const mountainGeo = new THREE.ConeGeometry(35, 90, 4); // Low-poly stylization
+            const mountainGeo = new THREE.ConeGeometry(35, 90, 4); 
             const mountainMat = new THREE.MeshStandardMaterial({ color: 0x220f40, roughness: 0.9, flatShading: true });
             
             for (let i = 0; i < 25; i++) {
@@ -237,7 +227,6 @@
                 scene.add(mountain);
             }
 
-            // Raising Traditional Sacred Vertical Flagpoles (Darshing)
             const poleGeo = new THREE.CylinderGeometry(0.25, 0.5, 45, 8);
             const poleMat = new THREE.MeshStandardMaterial({ color: 0x4a2f13, roughness: 0.7 });
             
@@ -250,7 +239,6 @@
                 poleMesh.position.y = 22.5;
                 poleGroup.add(poleMesh);
 
-                // Hanging vertical banner draperies off poles
                 const flagMesh = new THREE.Mesh(flagGeo, flagMat);
                 flagMesh.position.set(2.5, 26, 0);
                 poleGroup.add(flagMesh);
@@ -258,31 +246,26 @@
                 let rx = (Math.random() - 0.5) * (realmSize - 60);
                 let rz = (Math.random() - 0.5) * (realmSize - 60);
                 poleGroup.position.set(rx, -2, rz);
-                // Minor random tilt to simulate high alpine heavy winds gust force vectors
                 poleGroup.rotation.z = (Math.random() - 0.5) * 0.08;
                 
                 scene.add(poleGroup);
             }
 
-            // Erecting Towering Spiritual Shrines (Chortens / Stupas)
             for (let i = 0; i < 18; i++) {
                 const stupaStack = new THREE.Group();
                 
-                // Base foundational tiered blocks
                 const tierGeo = new THREE.BoxGeometry(18, 5, 18);
                 const whiteStoneMat = new THREE.MeshStandardMaterial({ color: 0xfcfaff, roughness: 0.6 });
                 const foundation = new THREE.Mesh(tierGeo, whiteStoneMat);
                 foundation.position.y = 2.5;
                 stupaStack.add(foundation);
 
-                // Spherical dome midsections
                 const domeGeo = new THREE.SphereGeometry(6.5, 10, 10);
                 const dome = new THREE.Mesh(domeGeo, whiteStoneMat);
                 dome.position.y = 9;
                 dome.scale.set(1.1, 0.88, 1.1);
                 stupaStack.add(dome);
 
-                // Golden ornamental spire peaks
                 const spireGeo = new THREE.ConeGeometry(2.5, 11, 10);
                 const goldMat = new THREE.MeshStandardMaterial({ color: 0xffcc00, metalness: 0.9, roughness: 0.15 });
                 const spire = new THREE.Mesh(spireGeo, goldMat);
@@ -296,26 +279,20 @@
             }
         }
 
-        // =========================================================================
-        // THUNDER DRAGON (DRUK) INDEPENDENT RIG CONFIGURATIONS
-        // =========================================================================
         function spawnThunderDragon() {
             dragonHead = new THREE.Group();
 
-            // Primary Cranial Scale Box Structure
             const jawGeo = new THREE.BoxGeometry(2.2, 1.8, 3.6);
             const whiteScaleMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25, metalness: 0.1 });
             const coreSkull = new THREE.Mesh(jawGeo, whiteScaleMat);
             coreSkull.position.y = 0.9;
             dragonHead.add(coreSkull);
 
-            // Piercing Glowing Crimson Eyes
             const irisGeo = new THREE.SphereGeometry(0.32, 12, 12);
             const furiousEyeMat = new THREE.MeshBasicMaterial({ color: 0xff0033 });
             const leftEye = new THREE.Mesh(irisGeo, furiousEyeMat); leftEye.position.set(-1.12, 1.25, 1.0); dragonHead.add(leftEye);
             const rightEye = leftEye.clone(); rightEye.position.x = 1.12; dragonHead.add(rightEye);
 
-            // Elaborate Branched Imperial Golden Horn Crests
             const hornGeo = new THREE.ConeGeometry(0.22, 3.2, 5);
             const imperialGoldMat = new THREE.MeshStandardMaterial({ color: 0xffbb00, metalness: 0.85, roughness: 0.2 });
             const leftHorn = new THREE.Mesh(hornGeo, imperialGoldMat);
@@ -328,21 +305,18 @@
             rightHorn.rotation.z = Math.PI / 10;
             dragonHead.add(rightHorn);
 
-            dragonHead.position.set(0, 24, 0); // Spawns cleanly suspended high up in wind channels
+            dragonHead.position.set(0, 24, 0); 
             scene.add(dragonHead);
 
-            // CONSTRUCTING THE FLUID TAIL LINK SPHERES ARRAY
             const linkGeo = new THREE.SphereGeometry(1.4, 12, 12);
             const linkMat = new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.35 });
 
             for (let i = 0; i < totalSegments; i++) {
                 const linkMesh = new THREE.Mesh(linkGeo, linkMat);
                 
-                // Gradually taper scales dimension limits down towards tip node
                 let scaleRatio = 1.0 - (i * 0.11);
                 linkMesh.scale.set(scaleRatio, scaleRatio, scaleRatio);
                 
-                // Affix sharp golden dorsal spinal ridges across segment shells
                 const spineRidgeGeo = new THREE.BoxGeometry(0.35, 0.75, 0.75);
                 const ridgeSpike = new THREE.Mesh(spineRidgeGeo, imperialGoldMat);
                 ridgeSpike.position.y = 1.2;
@@ -352,7 +326,6 @@
                 segmentsArray.push(linkMesh);
             }
 
-            // Hydrate multi-index coordinate tracking buffers with matching instantiation parameters vectors
             const capacity = totalSegments * segmentDelayInterval * 2;
             for (let i = 0; i < capacity; i++) {
                 trackingX.push(dragonHead.position.x);
@@ -362,20 +335,16 @@
             }
         }
 
-        // =========================================================================
-        // PARTICLE SPAWNER: CELESTIAL CLOUD SPARKS TRAIL
-        // =========================================================================
         function createCosmicCloudTrail() {
             const positionsBuffer = new Float32Array(sparksCount * 3);
             const particlesGeo = new THREE.BufferGeometry();
             particlesGeo.setAttribute('position', new THREE.BufferAttribute(positionsBuffer, 3));
 
-            // Generate soft atmospheric glowing circular texture arrays via direct memory canvas injection
             const dotCanvas = document.createElement('canvas');
             dotCanvas.width = 32; dotCanvas.height = 32;
             const dotCtx = dotCanvas.getContext('2d');
             const gradient = dotCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
-            gradient.addColorStop(0, 'rgba(255, 215, 0, 0.55)'); // Radiating golden tail spark clusters
+            gradient.addColorStop(0, 'rgba(255, 215, 0, 0.55)'); 
             gradient.addColorStop(1, 'rgba(0,0,0,0)');
             dotCtx.fillStyle = gradient; dotCtx.fillRect(0, 0, 32, 32);
             const dotTex = new THREE.CanvasTexture(dotCanvas);
@@ -401,17 +370,15 @@
                 let spark = particlesData[i];
 
                 if (spark.remainingLife <= 0) {
-                    // Respawn spent cloud spark directly behind dragon tail tip anchor coordinates
                     spark.x = lastTailSegmentCoords.x + (Math.random() - 0.5) * 2.5;
                     spark.y = lastTailSegmentCoords.y + (Math.random() - 0.5) * 1.5;
                     spark.z = lastTailSegmentCoords.z + (Math.random() - 0.5) * 2.5;
 
-                    // Compute soft drift atmospheric dispersal paths vectors
                     spark.vx = (Math.random() - 0.5) * 0.06;
-                    spark.vy = Math.random() * 0.05 + 0.02; // Spark floats upward into mountain cloud streams
+                    spark.vy = Math.random() * 0.05 + 0.02; 
                     spark.vz = (Math.random() - 0.5) * 0.06;
 
-                    spark.remainingLife = Math.random() * 35 + 25; // Reset life spans
+                    spark.remainingLife = Math.random() * 35 + 25; 
                 } else {
                     spark.x += spark.vx; spark.y += spark.vy; spark.z += spark.vz;
                     spark.remainingLife--;
@@ -425,9 +392,6 @@
             particlesSystem.geometry.attributes.position.needsUpdate = true;
         }
 
-        // =========================================================================
-        // VELOCITY ENGINE EVENT LISTENERS
-        // =========================================================================
         function updateInputs(e, isPressed) {
             switch (e.key.toLowerCase()) {
                 case 'w': keyState.w = isPressed; break;
@@ -443,9 +407,6 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
-        // =========================================================================
-        // SYSTEM MASTER RENDERING TICK FRAME ITERATOR
-        // =========================================================================
         function animate() {
             requestAnimationFrame(animate);
 
@@ -454,7 +415,6 @@
             if (keyState.d) headingAngle -= turningSpeed;
             dragonHead.rotation.y = headingAngle;
 
-            // Bank cranial head shell mesh into turn execution arcs for real feel weight dynamics
             if (keyState.a) dragonHead.rotation.z = THREE.MathUtils.lerp(dragonHead.rotation.z, 0.4, 0.1);
             else if (keyState.d) dragonHead.rotation.z = THREE.MathUtils.lerp(dragonHead.rotation.z, -0.4, 0.1);
             else dragonHead.rotation.z = THREE.MathUtils.lerp(dragonHead.rotation.z, 0, 0.1);
@@ -471,14 +431,32 @@
                 else if (velocity < 0) velocity = Math.min(0, velocity + windResistance);
             }
 
-            // Update Head Space Coordinates based on vector angle outputs
-            dragonHead.position.x += Math.sin(headingAngle) * velocity * 5;
-            dragonHead.position.z += Math.cos(headingAngle) * velocity * 5;
+            // Calculate next intended position frame step
+            let nextX = dragonHead.position.x + Math.sin(headingAngle) * velocity * 5;
+            let nextZ = dragonHead.position.z + Math.cos(headingAngle) * velocity * 5;
 
-            // Fluidly oscillate core flight altitudes levels to mimic undulating draconic levitation waves
+            // 3. LITERAL HARD WALL CLAMP ENGINE
+            const limit = realmSize / 2 - 5; // Subtle offset buffer so the head mesh doesn't visually clip past the boundary floor edge
+            let hitWall = false;
+
+            if (nextX > limit) { nextX = limit; hitWall = true; }
+            if (nextX < -limit) { nextX = -limit; hitWall = true; }
+            if (nextZ > limit) { nextZ = limit; hitWall = true; }
+            if (nextZ < -limit) { nextZ = -limit; hitWall = true; }
+
+            // If we physically crunched into a boundary wall, immediately kill forward momentum
+            if (hitWall && velocity > 0) {
+                velocity = 0;
+            }
+
+            // Commit safely validated step updates to the matrix transform
+            dragonHead.position.x = nextX;
+            dragonHead.position.z = nextZ;
+
+            // Fluidly oscillate core flight altitudes levels
             dragonHead.position.y = 24 + Math.sin(Date.now() * 0.0035) * 3.5;
 
-            // 3. Shift Positional Tracking Buffers Arrays Down Sequence Matrices Line
+            // 4. Shift Positional Tracking Buffers Arrays Down Sequence Matrices Line
             trackingX.unshift(dragonHead.position.x);
             trackingY.unshift(dragonHead.position.y);
             trackingZ.unshift(dragonHead.position.z);
@@ -486,7 +464,7 @@
 
             trackingX.pop(); trackingY.pop(); trackingZ.pop(); trackingRotY.pop();
 
-            // 4. Undulating Snake Segment Trailing Matrix Updates Pipeline Loops
+            // 5. Undulating Snake Segment Trailing Matrix Updates Pipeline Loops
             for (let i = 0; i < totalSegments; i++) {
                 let targetHistoryIndex = (i + 1) * segmentDelayInterval;
                 let segmentNode = segmentsArray[i];
@@ -494,29 +472,19 @@
                 segmentNode.position.x = trackingX[targetHistoryIndex];
                 segmentNode.position.z = trackingZ[targetHistoryIndex];
                 
-                // Introduce lateral sine wave ripple offset to generate hyper-realistic serpentine wind-slithering motion
                 let mechanicalSineRipple = Math.sin((Date.now() * 0.007) - (i * 0.75)) * 0.85;
                 let transverseAngle = trackingRotY[targetHistoryIndex] + Math.PI / 2;
                 segmentNode.position.x += Math.sin(transverseAngle) * mechanicalSineRipple;
                 segmentNode.position.z += Math.cos(transverseAngle) * mechanicalSineRipple;
                 
-                // Match undulating flight altitude ripple chain values
                 segmentNode.position.y = 24 + Math.sin((Date.now() * 0.0035) - (i * 0.45)) * 3.5;
                 segmentNode.rotation.y = trackingRotY[targetHistoryIndex];
             }
-
-            // 5. Wrap Arena Grid Perimeter Boundary Safety Clamps
-            const limit = realmSize / 2;
-            if (dragonHead.position.x > limit) dragonHead.position.x = -limit;
-            if (dragonHead.position.x < -limit) dragonHead.position.x = limit;
-            if (dragonHead.position.z > limit) dragonHead.position.z = -limit;
-            if (dragonHead.position.z < -limit) dragonHead.position.z = limit;
 
             // 6. Refresh Trail Particle Generators Positions Arrays
             refreshCosmicTrailParticles();
 
             // 7. Dynamic Chase Elastic Tracking Camera Physics Rig
-            // Distance pulls backward proportionally matched to airspeed vectors to enrich spatial peripheral vision frames
             const currentCamDistance = -22 - (velocity * 10);
             const currentCamHeight = 9 + (velocity * 4);
 
@@ -537,7 +505,6 @@
             renderer.render(scene, camera);
         }
 
-        // Initialize Runtime Engine Components Stack
         init();
     </script>
 </body>
