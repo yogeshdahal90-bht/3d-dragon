@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THUNDER DRAGON // FLIGHT MATRIX</title>
+    <title>THE THUNDER DRAGON'S ASCENT</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         * {
@@ -16,7 +16,8 @@
             height: 100%;
             overflow: hidden;
             background-color: #0b0214;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none;
         }
         #game-canvas {
             width: 100%;
@@ -24,47 +25,59 @@
             display: block;
         }
         /* Kingdom HUD Overlays */
-        .hud-display {
+        .hud-container {
             position: absolute;
             top: 25px;
             left: 25px;
-            color: #ffffff;
+            display: flex;
+            gap: 15px;
             pointer-events: none;
-            background: rgba(20, 8, 38, 0.8);
-            border: 2px solid #ffcc00;
-            padding: 18px 24px;
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.25);
-            backdrop-filter: blur(10px);
             z-index: 10;
         }
+        .hud-card {
+            color: #ffffff;
+            background: rgba(20, 8, 38, 0.85);
+            border: 2px solid #ffcc00;
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        .hud-card.penalty {
+            border-color: #ff3b00;
+            box-shadow: 0 0 25px rgba(255, 59, 0, 0.2);
+        }
         .hud-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            color: #ff3b00;
-            margin-bottom: 4px;
-            font-weight: 900;
+            letter-spacing: 2px;
+            color: #a78bfa;
+            margin-bottom: 2px;
+            font-weight: 800;
         }
         .hud-value {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 800;
             color: #ffcc00;
-            text-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.4);
+        }
+        .hud-card.penalty .hud-value {
+            color: #ff3b00;
+            text-shadow: 0 0 10px rgba(255, 59, 0, 0.4);
         }
         .controls-manifest {
             position: absolute;
             bottom: 25px;
             right: 25px;
-            background: rgba(15, 5, 28, 0.85);
-            border: 1px solid #ff3b00;
+            background: rgba(15, 5, 28, 0.9);
+            border: 1px solid #a78bfa;
             padding: 15px 20px;
             border-radius: 6px;
             color: #cbd5e1;
             font-size: 0.85rem;
             pointer-events: none;
             line-height: 1.7;
-            box-shadow: 0 0 20px rgba(255, 59, 0, 0.15);
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.15);
             z-index: 10;
         }
         .btn-key {
@@ -77,20 +90,52 @@
             margin-right: 4px;
             box-shadow: 0 2px 0 #b38f00;
         }
+        /* Notification Alert toast for scores/penalties */
+        #alert-toast {
+            position: absolute;
+            top: 120px;
+            left: 25px;
+            color: #ffcc00;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            transform: translateY(-10px);
+            pointer-events: none;
+            z-index: 10;
+            background: rgba(11, 2, 20, 0.8);
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="hud-display">
-        <div class="hud-label">Druk Flight Speed</div>
-        <div id="speedometer" class="hud-value">0.0 CLOUDS/H</div>
+    <div class="hud-container">
+        <div class="hud-card">
+            <div class="hud-label">Merit Score</div>
+            <div id="score-display" class="hud-value">0</div>
+        </div>
+        <div class="hud-card">
+            <div class="hud-label">Druk Length</div>
+            <div id="length-display" class="hud-value">7</div>
+        </div>
+        <div class="hud-card penalty">
+            <div class="hud-label">Air Velocity</div>
+            <div id="speedometer" class="hud-value">0.0 C/H</div>
+        </div>
     </div>
 
+    <div id="alert-toast">SACRED HARVEST!</div>
+
     <div class="controls-manifest">
-        <p style="color: #ffcc00; font-weight: bold; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;">Sacred Realm Navigation</p>
-        <p><span class="btn-key">W</span> Ride Cosmic Wind Currents (Speed up)</p>
-        <p><span class="btn-key">S</span> Counter Headwinds (Slow down)</p>
-        <p><span class="btn-key">A</span> / <span class="btn-key">D</span> Bank & Slither Lateral Axis</p>
+        <p style="color: #ffcc00; font-weight: bold; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;">Druk's Harvest</p>
+        <p><span class="btn-key">W</span> Accelerate Flight Velocity</p>
+        <p><span class="btn-key">S</span> Decelerate / Cruise</p>
+        <p><span class="btn-key">A</span> / <span class="btn-key">D</span> Steer Draconic Flight Path</p>
+        <p style="margin-top: 5px; font-size: 0.75rem; color: #f87171;">⚠️ Avoid hitting Chhorten walls (Removes length/points!)</p>
     </div>
 
     <canvas id="game-canvas"></canvas>
@@ -98,72 +143,66 @@
     <script>
         let scene, camera, renderer, dragonHead;
         let segmentsArray = [], totalSegments = 7;
-        let particlesSystem, sparksCount = 120, particlesData = [];
+        const initialSegments = 7;
+        let particlesSystem, sparksCount = 150, particlesData = [];
         let keyState = { w: false, a: false, s: false, d: false };
         
+        // Game State Core Variables
+        let score = 0;
+        let currentTargetMesh, targetLight, targetType = 'norbu'; 
+        let targetRadius = 3.5; 
+        let cameraShake = 0;
+
         // Flight Vector Core Metrics
         let velocity = 0;
-        const maxVelocity = 1.1;
-        const thrustPower = 0.018;
-        const windResistance = 0.007;
+        const maxVelocity = 1.2;
+        const thrustPower = 0.02;
+        const windResistance = 0.008;
         let headingAngle = 0;
-        const turningSpeed = 0.045;
+        const turningSpeed = 0.048;
         
         // Fluid Drag Tracking Array Matrices
         let trackingX = [], trackingY = [], trackingZ = [], trackingRotY = [];
         const segmentDelayInterval = 6; 
-
-        // World Bounds Configuration
         const realmSize = 500; 
+        let imperialGoldMat, linkGeo; // Shared assets for tail scaling additions
 
         function init() {
             const canvas = document.getElementById('game-canvas');
 
-            // 1. Setup Scene Framework & Beautiful Saffron Fog
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x0f051d); 
-            scene.fog = new THREE.FogExp2(0xff4500, 0.004); 
+            scene.fog = new THREE.FogExp2(0xff4500, 0.0035); 
 
-            // 2. High-FOV Tracking Camera Lens
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 1200);
 
-            // 3. WebGL High Performance Renderer
             renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
 
-            // 4. Vibrant Structural Lighting Layout
-            const globalAmbient = new THREE.AmbientLight(0x3a105c, 0.75); 
+            const globalAmbient = new THREE.AmbientLight(0x3a105c, 0.8); 
             scene.add(globalAmbient);
 
-            const majesticSun = new THREE.DirectionalLight(0xffcc00, 1.4); 
+            const majesticSun = new THREE.DirectionalLight(0xffcc00, 1.3); 
             majesticSun.position.set(80, 150, 40);
             scene.add(majesticSun);
 
-            const horizonFillLight = new THREE.PointLight(0xff3b00, 1.2, 300); 
-            horizonFillLight.position.set(0, -10, 0);
-            scene.add(horizonFillLight);
+            // Dynamic light item tracks
+            targetLight = new THREE.PointLight(0x00ffff, 2.5, 40);
+            scene.add(targetLight);
 
-            // 5. Instantiating Procedural Vector Textures
             const prayerFlagTexture = createFlagTexture();
             const cloudSeaTexture = createCloudSeaTexture();
 
-            // 6. Generating the Mythic Play Zone Terrain
             generateRealmEnvironment(cloudSeaTexture, prayerFlagTexture);
-
-            // 7. Building the Multi-Segment Imperial Dragon (Druk)
             spawnThunderDragon();
-
-            // 8. Injecting Particle Engine for Golden Tail Sparks
             createCosmicCloudTrail();
+            spawnSacredTarget(); // Initial collectible item pass
 
-            // 9. Input Hooks
             window.addEventListener('keydown', (e) => updateInputs(e, true));
             window.addEventListener('keyup', (e) => updateInputs(e, false));
             window.addEventListener('resize', onViewportResize);
 
-            // 10. Spin the Frame Update Cycles
             animate();
         }
 
@@ -177,7 +216,6 @@
             for(let i = 0; i < traditionalColors.length; i++) {
                 ctx.fillStyle = traditionalColors[i];
                 ctx.fillRect(i * stripeWidth, 0, stripeWidth, 64);
-                
                 ctx.fillStyle = 'rgba(10, 5, 25, 0.2)';
                 ctx.font = 'bold 9px Courier New';
                 ctx.fillText('༄ཨོཾམཎི', i * stripeWidth + 4, 26);
@@ -190,11 +228,9 @@
             const canvas = document.createElement('canvas');
             canvas.width = 512; canvas.height = 512;
             const ctx = canvas.getContext('2d');
-            
             ctx.fillStyle = '#0f051d'; ctx.fillRect(0, 0, 512, 512);
-            
-            ctx.strokeStyle = 'rgba(255, 69, 0, 0.4)'; ctx.lineWidth = 4;
-            for(let i = 0; i < 30; i++) {
+            ctx.strokeStyle = 'rgba(255, 69, 0, 0.35)'; ctx.lineWidth = 4;
+            for(let i = 0; i < 25; i++) {
                 ctx.beginPath();
                 let cx = Math.random() * 512, cy = Math.random() * 512, radius = Math.random() * 50 + 25;
                 ctx.arc(cx, cy, radius, 0, Math.PI * 1.5, false);
@@ -218,10 +254,10 @@
             const mountainGeo = new THREE.ConeGeometry(35, 90, 4); 
             const mountainMat = new THREE.MeshStandardMaterial({ color: 0x220f40, roughness: 0.9, flatShading: true });
             
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < 12; i++) {
                 const mountain = new THREE.Mesh(mountainGeo, mountainMat);
-                let rx = (Math.random() - 0.5) * (realmSize - 120);
-                let rz = (Math.random() - 0.5) * (realmSize - 120);
+                let rx = (Math.random() - 0.5) * (realmSize - 160);
+                let rz = (Math.random() - 0.5) * (realmSize - 160);
                 mountain.position.set(rx, 25, rz);
                 mountain.rotation.y = Math.random() * Math.PI;
                 scene.add(mountain);
@@ -229,11 +265,10 @@
 
             const poleGeo = new THREE.CylinderGeometry(0.25, 0.5, 45, 8);
             const poleMat = new THREE.MeshStandardMaterial({ color: 0x4a2f13, roughness: 0.7 });
-            
             const flagGeo = new THREE.PlaneGeometry(5, 32);
             const flagMat = new THREE.MeshStandardMaterial({ map: flagTex, side: THREE.DoubleSide, roughness: 0.6 });
 
-            for (let i = 0; i < 40; i++) {
+            for (let i = 0; i < 30; i++) {
                 const poleGroup = new THREE.Group();
                 const poleMesh = new THREE.Mesh(poleGeo, poleMat);
                 poleMesh.position.y = 22.5;
@@ -243,11 +278,10 @@
                 flagMesh.position.set(2.5, 26, 0);
                 poleGroup.add(flagMesh);
 
-                let rx = (Math.random() - 0.5) * (realmSize - 80);
-                let rz = (Math.random() - 0.5) * (realmSize - 80);
+                let rx = (Math.random() - 0.5) * (realmSize - 100);
+                let rz = (Math.random() - 0.5) * (realmSize - 100);
                 poleGroup.position.set(rx, -2, rz);
                 poleGroup.rotation.z = (Math.random() - 0.5) * 0.08;
-                
                 scene.add(poleGroup);
             }
 
@@ -257,44 +291,31 @@
             const wallLimit = realmSize / 2 - 5; 
             const chhortenSpacing = 22; 
 
-            const chhortenMat = new THREE.MeshStandardMaterial({ 
-                color: 0xffffff, 
-                roughness: 0.5,
-                metalness: 0.05
-            });
-
+            const chhortenMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, metalness: 0.05 });
             const cubeBaseGeo = new THREE.BoxGeometry(12, 10, 12); 
             const sphereMidGeo = new THREE.SphereGeometry(4.8, 16, 16); 
             const spireTopGeo = new THREE.CylinderGeometry(0.5, 2.5, 9, 16); 
 
             function spawnChhortenAt(x, z) {
                 const chhortenGroup = new THREE.Group();
-                
-                // Layer 1: Cube Base
                 const baseElement = new THREE.Mesh(cubeBaseGeo, chhortenMat);
-                baseElement.position.y = 5; 
-                chhortenGroup.add(baseElement);
+                baseElement.position.y = 5; chhortenGroup.add(baseElement);
 
-                // Layer 2: Middle Sphere (Bumpa)
                 const midElement = new THREE.Mesh(sphereMidGeo, chhortenMat);
-                midElement.position.y = 13.5; 
-                chhortenGroup.add(midElement);
+                midElement.position.y = 13.5; chhortenGroup.add(midElement);
 
-                // Layer 3: Tapering Cylinder Spire
                 const topElement = new THREE.Mesh(spireTopGeo, chhortenMat);
-                topElement.position.y = 20.5; 
-                chhortenGroup.add(topElement);
+                topElement.position.y = 20.5; chhortenGroup.add(topElement);
 
                 chhortenGroup.position.set(x, -5, z);
                 scene.add(chhortenGroup);
             }
 
-            // Line them up edge-to-edge as a physical border wall layout
             for (let pos = -wallLimit; pos <= wallLimit; pos += chhortenSpacing) {
-                spawnChhortenAt(pos, -wallLimit); // North Border
-                spawnChhortenAt(pos, wallLimit);  // South Border
-                spawnChhortenAt(wallLimit, pos);  // East Border
-                spawnChhortenAt(-wallLimit, pos); // West Border
+                spawnChhortenAt(pos, -wallLimit);
+                spawnChhortenAt(pos, wallLimit); 
+                spawnChhortenAt(wallLimit, pos); 
+                spawnChhortenAt(-wallLimit, pos);
             }
         }
 
@@ -313,45 +334,107 @@
             const rightEye = leftEye.clone(); rightEye.position.x = 1.12; dragonHead.add(rightEye);
 
             const hornGeo = new THREE.ConeGeometry(0.22, 3.2, 5);
-            const imperialGoldMat = new THREE.MeshStandardMaterial({ color: 0xffbb00, metalness: 0.85, roughness: 0.2 });
+            imperialGoldMat = new THREE.MeshStandardMaterial({ color: 0xffbb00, metalness: 0.85, roughness: 0.2 });
             const leftHorn = new THREE.Mesh(hornGeo, imperialGoldMat);
             leftHorn.position.set(-0.65, 2.4, -0.7);
             leftHorn.rotation.set(-Math.PI / 5, 0, -Math.PI / 10);
             dragonHead.add(leftHorn);
 
             const rightHorn = leftHorn.clone();
-            rightHorn.position.x = 0.65;
-            rightHorn.rotation.z = Math.PI / 10;
+            rightHorn.position.x = 0.65; rightHorn.rotation.z = Math.PI / 10;
             dragonHead.add(rightHorn);
 
             dragonHead.position.set(0, 24, 0); 
             scene.add(dragonHead);
 
-            const linkGeo = new THREE.SphereGeometry(1.4, 12, 12);
+            linkGeo = new THREE.SphereGeometry(1.4, 12, 12);
             const linkMat = new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.35 });
 
             for (let i = 0; i < totalSegments; i++) {
-                const linkMesh = new THREE.Mesh(linkGeo, linkMat);
-                
-                let scaleRatio = 1.0 - (i * 0.11);
-                linkMesh.scale.set(scaleRatio, scaleRatio, scaleRatio);
-                
-                const spineRidgeGeo = new THREE.BoxGeometry(0.35, 0.75, 0.75);
-                const ridgeSpike = new THREE.Mesh(spineRidgeGeo, imperialGoldMat);
-                ridgeSpike.position.y = 1.2;
-                linkMesh.add(ridgeSpike);
-
-                scene.add(linkMesh);
-                segmentsArray.push(linkMesh);
+                appendTailMeshNode(i, linkMat);
             }
 
-            const capacity = totalSegments * segmentDelayInterval * 2;
+            // Fill matrix buffers heavily upfront to accommodate dynamically growing chains smoothly
+            const capacity = 1500; 
             for (let i = 0; i < capacity; i++) {
                 trackingX.push(dragonHead.position.x);
                 trackingY.push(dragonHead.position.y);
                 trackingZ.push(dragonHead.position.z);
                 trackingRotY.push(headingAngle);
             }
+        }
+
+        function appendTailMeshNode(index, mat) {
+            const linkMesh = new THREE.Mesh(linkGeo, mat || new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.35 }));
+            
+            // Dynamic scale attenuation trick based on tail index
+            let scaleRatio = Math.max(0.25, 1.0 - (index * 0.06));
+            linkMesh.scale.set(scaleRatio, scaleRatio, scaleRatio);
+            
+            const spineRidgeGeo = new THREE.BoxGeometry(0.35, 0.75, 0.75);
+            const ridgeSpike = new THREE.Mesh(spineRidgeGeo, imperialGoldMat);
+            ridgeSpike.position.y = 1.2;
+            linkMesh.add(ridgeSpike);
+
+            scene.add(linkMesh);
+            segmentsArray.push(linkMesh);
+        }
+
+        function spawnSacredTarget() {
+            if (currentTargetMesh) scene.remove(currentTargetMesh);
+
+            targetType = Math.random() > 0.5 ? 'norbu' : 'ema';
+            const targetGroup = new THREE.Group();
+
+            if (targetType === 'norbu') {
+                // Sacred Shimmering Diamond Jewel
+                const jewelGeo = new THREE.OctahedronGeometry(2.2, 0);
+                const jewelMat = new THREE.MeshStandardMaterial({ 
+                    color: 0x00ffff, metalness: 0.9, roughness: 0.1,
+                    emissive: 0x004455, flatShading: true 
+                });
+                const jewel = new THREE.Mesh(jewelGeo, jewelMat);
+                targetGroup.add(jewel);
+                targetLight.color.setHex(0x00ffff);
+            } else {
+                // Sacred Red Chili (Ema) - Staked Cylinder + Taper Point
+                const chiliBodyGeo = new THREE.CylinderGeometry(0.6, 1.3, 3.5, 8);
+                const chiliTipGeo = new THREE.ConeGeometry(1.3, 2.5, 8);
+                const chiliMat = new THREE.MeshStandardMaterial({ color: 0xff0022, roughness: 0.2, emissive: 0x330000 });
+                
+                const body = new THREE.Mesh(chiliBodyGeo, chiliMat);
+                const tip = new THREE.Mesh(chiliTipGeo, chiliMat);
+                tip.position.y = -3;
+                tip.rotation.x = Math.PI;
+                
+                targetGroup.add(body);
+                targetGroup.add(tip);
+                targetGroup.rotation.z = -0.4; // Hanging angled look
+                targetLight.color.setHex(0xff0022);
+            }
+
+            // Keep spawns comfortably inside the Chhorten barrier limits
+            const spawnRange = realmSize / 2 - 35;
+            let rx = (Math.random() - 0.5) * spawnRange * 2;
+            let rz = (Math.random() - 0.5) * spawnRange * 2;
+            
+            targetGroup.position.set(rx, 24, rz);
+            scene.add(targetGroup);
+            currentTargetMesh = targetGroup;
+            targetLight.position.set(rx, 26, rz);
+        }
+
+        function triggerAlert(text, isBad) {
+            const toast = document.getElementById('alert-toast');
+            toast.innerText = text;
+            toast.style.color = isBad ? '#ff3b00' : '#ffcc00';
+            toast.style.opacity = 1;
+            toast.style.transform = 'translateY(0px)';
+            
+            setTimeout(() => {
+                toast.style.opacity = 0;
+                toast.style.transform = 'translateY(-10px)';
+            }, 900);
         }
 
         function createCosmicCloudTrail() {
@@ -363,13 +446,12 @@
             dotCanvas.width = 32; dotCanvas.height = 32;
             const dotCtx = dotCanvas.getContext('2d');
             const gradient = dotCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
-            gradient.addColorStop(0, 'rgba(255, 215, 0, 0.55)'); 
-            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            gradient.addColorStop(0, 'rgba(255, 215, 0, 0.6)'); gradient.addColorStop(1, 'rgba(0,0,0,0)');
             dotCtx.fillStyle = gradient; dotCtx.fillRect(0, 0, 32, 32);
             const dotTex = new THREE.CanvasTexture(dotCanvas);
 
             const pointsMat = new THREE.PointsMaterial({
-                size: 2.8, map: dotTex, transparent: true,
+                size: 3.0, map: dotTex, transparent: true,
                 blending: THREE.AdditiveBlending, depthWrite: false
             });
 
@@ -387,26 +469,20 @@
 
             for (let i = 0; i < sparksCount; i++) {
                 let spark = particlesData[i];
-
                 if (spark.remainingLife <= 0) {
                     spark.x = lastTailSegmentCoords.x + (Math.random() - 0.5) * 2.5;
                     spark.y = lastTailSegmentCoords.y + (Math.random() - 0.5) * 1.5;
                     spark.z = lastTailSegmentCoords.z + (Math.random() - 0.5) * 2.5;
-
                     spark.vx = (Math.random() - 0.5) * 0.06;
                     spark.vy = Math.random() * 0.05 + 0.02; 
                     spark.vz = (Math.random() - 0.5) * 0.06;
-
                     spark.remainingLife = Math.random() * 35 + 25; 
                 } else {
                     spark.x += spark.vx; spark.y += spark.vy; spark.z += spark.vz;
                     spark.remainingLife--;
                 }
-
                 let idx = i * 3;
-                coords[idx] = spark.x;
-                coords[idx + 1] = spark.y;
-                coords[idx + 2] = spark.z;
+                coords[idx] = spark.x; coords[idx + 1] = spark.y; coords[idx + 2] = spark.z;
             }
             particlesSystem.geometry.attributes.position.needsUpdate = true;
         }
@@ -454,7 +530,7 @@
             let nextX = dragonHead.position.x + Math.sin(headingAngle) * velocity * 5;
             let nextZ = dragonHead.position.z + Math.cos(headingAngle) * velocity * 5;
 
-            // 3. LITERAL HARD WALL CLAMP ENGINE
+            // 3. HARD CHHORTEN BARRIER CLAMP WITH LOSS CONDITIONS
             const limit = realmSize / 2 - 5; 
             let hitWall = false;
 
@@ -463,19 +539,54 @@
             if (nextZ > limit) { nextZ = limit; hitWall = true; }
             if (nextZ < -limit) { nextZ = -limit; hitWall = true; }
 
-            // If we physically crunched into a Chhorten boundary wall, kill forward kinetic momentum
             if (hitWall && velocity > 0) {
                 velocity = 0;
+                cameraShake = 8; // Impact tremor effect
+                
+                // Penalty Calculation Logic
+                score = Math.max(0, score - 5);
+                document.getElementById('score-display').innerText = score;
+
+                if (totalSegments > initialSegments) {
+                    totalSegments--;
+                    let removedNode = segmentsArray.pop();
+                    scene.remove(removedNode);
+                    document.getElementById('length-display').innerText = totalSegments;
+                    triggerAlert("💥 WALL IMPACT! LENGTH DOCKED", true);
+                } else {
+                    triggerAlert("💥 WALL IMPACT! MERIT DOCKED", true);
+                }
             }
 
-            // Commit safely validated step updates to the matrix transform
             dragonHead.position.x = nextX;
             dragonHead.position.z = nextZ;
-
-            // Fluidly oscillate core flight altitudes levels
             dragonHead.position.y = 24 + Math.sin(Date.now() * 0.0035) * 3.5;
 
-            // 4. Shift Positional Tracking Buffers Arrays Down Sequence Matrices Line
+            // 4. Update Target Item Behaviors & Check Hitbox Collisions
+            if (currentTargetMesh) {
+                currentTargetMesh.rotation.y += 0.025;
+                currentTargetMesh.position.y = 24 + Math.sin(Date.now() * 0.005) * 1.2;
+
+                // Simple 2D horizontal vector distance calculation
+                let dx = dragonHead.position.x - currentTargetMesh.position.x;
+                let dz = dragonHead.position.z - currentTargetMesh.position.z;
+                let actualDistance = Math.sqrt(dx * dx + dz * dz);
+
+                if (actualDistance < targetRadius) {
+                    // Success Event Loop
+                    score += (targetType === 'norbu') ? 15 : 10;
+                    totalSegments++;
+                    appendTailMeshNode(totalSegments - 1);
+                    
+                    document.getElementById('score-display').innerText = score;
+                    document.getElementById('length-display').innerText = totalSegments;
+                    triggerAlert((targetType === 'norbu') ? "✨ NORBU HARVESTED (+15)" : "🌶️ EMA SPICE HARVESTED (+10)", false);
+                    
+                    spawnSacredTarget();
+                }
+            }
+
+            // 5. Shift Positional Tracking Buffers Arrays
             trackingX.unshift(dragonHead.position.x);
             trackingY.unshift(dragonHead.position.y);
             trackingZ.unshift(dragonHead.position.z);
@@ -483,7 +594,7 @@
 
             trackingX.pop(); trackingY.pop(); trackingZ.pop(); trackingRotY.pop();
 
-            // 5. Undulating Snake Segment Trailing Matrix Updates Pipeline Loops
+            // 6. Undulating Snake Segment Trailing Pipeline Loops
             for (let i = 0; i < totalSegments; i++) {
                 let targetHistoryIndex = (i + 1) * segmentDelayInterval;
                 let segmentNode = segmentsArray[i];
@@ -500,27 +611,37 @@
                 segmentNode.rotation.y = trackingRotY[targetHistoryIndex];
             }
 
-            // 6. Refresh Trail Particle Generators Positions Arrays
+            // 7. Refresh Trail Particle Generators Positions Arrays
             refreshCosmicTrailParticles();
 
-            // 7. Dynamic Chase Elastic Tracking Camera Physics Rig
+            // 8. Dynamic Chase Elastic Tracking Camera Physics Rig with Screen Shake Integration
             const currentCamDistance = -22 - (velocity * 10);
             const currentCamHeight = 9 + (velocity * 4);
 
             const camOffsetVector = new THREE.Vector3(0, currentCamHeight, currentCamDistance);
             const computedGlobalTargetCamCoords = camOffsetVector.applyMatrix4(dragonHead.matrixWorld);
 
-            camera.position.x = THREE.MathUtils.lerp(camera.position.x, computedGlobalTargetCamCoords.x, 0.06);
-            camera.position.y = THREE.MathUtils.lerp(camera.position.y, computedGlobalTargetCamCoords.y, 0.06);
-            camera.position.z = THREE.MathUtils.lerp(camera.position.z, computedGlobalTargetCamCoords.z, 0.06);
+            let targetCamX = computedGlobalTargetCamCoords.x;
+            let targetCamY = computedGlobalTargetCamCoords.y;
+            let targetCamZ = computedGlobalTargetCamCoords.z;
+
+            if (cameraShake > 0) {
+                targetCamX += (Math.random() - 0.5) * cameraShake;
+                targetCamY += (Math.random() - 0.5) * cameraShake;
+                cameraShake *= 0.85; // Decay tone factor
+                if (cameraShake < 0.1) cameraShake = 0;
+            }
+
+            camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, 0.06);
+            camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetCamY, 0.06);
+            camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetCamZ, 0.06);
             
             camera.lookAt(new THREE.Vector3(dragonHead.position.x, dragonHead.position.y - 1.5, dragonHead.position.z));
 
-            // 8. Output Dashboard Speeds Parameters
+            // 9. Output Dashboard Speeds Parameters
             const speedometerReadoutGaugeValue = Math.abs(velocity * 160).toFixed(1);
-            document.getElementById('speedometer').innerText = `${speedometerReadoutGaugeValue} CLOUDS/H`;
+            document.getElementById('speedometer').innerText = `${speedometerReadoutGaugeValue} C/H`;
 
-            // 9. Fire Render Output Buffer
             renderer.render(scene, camera);
         }
 
