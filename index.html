@@ -218,10 +218,10 @@
             const mountainGeo = new THREE.ConeGeometry(35, 90, 4); 
             const mountainMat = new THREE.MeshStandardMaterial({ color: 0x220f40, roughness: 0.9, flatShading: true });
             
-            for (let i = 0; i < 25; i++) {
+            for (let i = 0; i < 15; i++) {
                 const mountain = new THREE.Mesh(mountainGeo, mountainMat);
-                let rx = (Math.random() - 0.5) * (realmSize - 100);
-                let rz = (Math.random() - 0.5) * (realmSize - 100);
+                let rx = (Math.random() - 0.5) * (realmSize - 120);
+                let rz = (Math.random() - 0.5) * (realmSize - 120);
                 mountain.position.set(rx, 25, rz);
                 mountain.rotation.y = Math.random() * Math.PI;
                 scene.add(mountain);
@@ -233,7 +233,7 @@
             const flagGeo = new THREE.PlaneGeometry(5, 32);
             const flagMat = new THREE.MeshStandardMaterial({ map: flagTex, side: THREE.DoubleSide, roughness: 0.6 });
 
-            for (let i = 0; i < 55; i++) {
+            for (let i = 0; i < 40; i++) {
                 const poleGroup = new THREE.Group();
                 const poleMesh = new THREE.Mesh(poleGeo, poleMat);
                 poleMesh.position.y = 22.5;
@@ -243,39 +243,58 @@
                 flagMesh.position.set(2.5, 26, 0);
                 poleGroup.add(flagMesh);
 
-                let rx = (Math.random() - 0.5) * (realmSize - 60);
-                let rz = (Math.random() - 0.5) * (realmSize - 60);
+                let rx = (Math.random() - 0.5) * (realmSize - 80);
+                let rz = (Math.random() - 0.5) * (realmSize - 80);
                 poleGroup.position.set(rx, -2, rz);
                 poleGroup.rotation.z = (Math.random() - 0.5) * 0.08;
                 
                 scene.add(poleGroup);
             }
 
-            for (let i = 0; i < 18; i++) {
-                const stupaStack = new THREE.Group();
+            // =========================================================================
+            // PERIMETER WALL: WHITE STONE TRADITIONAL CHHORTENS
+            // =========================================================================
+            const wallLimit = realmSize / 2 - 5; 
+            const chhortenSpacing = 22; 
+
+            const chhortenMat = new THREE.MeshStandardMaterial({ 
+                color: 0xffffff, 
+                roughness: 0.5,
+                metalness: 0.05
+            });
+
+            const cubeBaseGeo = new THREE.BoxGeometry(12, 10, 12); 
+            const sphereMidGeo = new THREE.SphereGeometry(4.8, 16, 16); 
+            const spireTopGeo = new THREE.CylinderGeometry(0.5, 2.5, 9, 16); 
+
+            function spawnChhortenAt(x, z) {
+                const chhortenGroup = new THREE.Group();
                 
-                const tierGeo = new THREE.BoxGeometry(18, 5, 18);
-                const whiteStoneMat = new THREE.MeshStandardMaterial({ color: 0xfcfaff, roughness: 0.6 });
-                const foundation = new THREE.Mesh(tierGeo, whiteStoneMat);
-                foundation.position.y = 2.5;
-                stupaStack.add(foundation);
+                // Layer 1: Cube Base
+                const baseElement = new THREE.Mesh(cubeBaseGeo, chhortenMat);
+                baseElement.position.y = 5; 
+                chhortenGroup.add(baseElement);
 
-                const domeGeo = new THREE.SphereGeometry(6.5, 10, 10);
-                const dome = new THREE.Mesh(domeGeo, whiteStoneMat);
-                dome.position.y = 9;
-                dome.scale.set(1.1, 0.88, 1.1);
-                stupaStack.add(dome);
+                // Layer 2: Middle Sphere (Bumpa)
+                const midElement = new THREE.Mesh(sphereMidGeo, chhortenMat);
+                midElement.position.y = 13.5; 
+                chhortenGroup.add(midElement);
 
-                const spireGeo = new THREE.ConeGeometry(2.5, 11, 10);
-                const goldMat = new THREE.MeshStandardMaterial({ color: 0xffcc00, metalness: 0.9, roughness: 0.15 });
-                const spire = new THREE.Mesh(spireGeo, goldMat);
-                spire.position.y = 17.5;
-                stupaStack.add(spire);
+                // Layer 3: Tapering Cylinder Spire
+                const topElement = new THREE.Mesh(spireTopGeo, chhortenMat);
+                topElement.position.y = 20.5; 
+                chhortenGroup.add(topElement);
 
-                let rx = (Math.random() - 0.5) * (realmSize - 120);
-                let rz = (Math.random() - 0.5) * (realmSize - 120);
-                stupaStack.position.set(rx, -3, rz);
-                scene.add(stupaStack);
+                chhortenGroup.position.set(x, -5, z);
+                scene.add(chhortenGroup);
+            }
+
+            // Line them up edge-to-edge as a physical border wall layout
+            for (let pos = -wallLimit; pos <= wallLimit; pos += chhortenSpacing) {
+                spawnChhortenAt(pos, -wallLimit); // North Border
+                spawnChhortenAt(pos, wallLimit);  // South Border
+                spawnChhortenAt(wallLimit, pos);  // East Border
+                spawnChhortenAt(-wallLimit, pos); // West Border
             }
         }
 
@@ -436,7 +455,7 @@
             let nextZ = dragonHead.position.z + Math.cos(headingAngle) * velocity * 5;
 
             // 3. LITERAL HARD WALL CLAMP ENGINE
-            const limit = realmSize / 2 - 5; // Subtle offset buffer so the head mesh doesn't visually clip past the boundary floor edge
+            const limit = realmSize / 2 - 5; 
             let hitWall = false;
 
             if (nextX > limit) { nextX = limit; hitWall = true; }
@@ -444,7 +463,7 @@
             if (nextZ > limit) { nextZ = limit; hitWall = true; }
             if (nextZ < -limit) { nextZ = -limit; hitWall = true; }
 
-            // If we physically crunched into a boundary wall, immediately kill forward momentum
+            // If we physically crunched into a Chhorten boundary wall, kill forward kinetic momentum
             if (hitWall && velocity > 0) {
                 velocity = 0;
             }
